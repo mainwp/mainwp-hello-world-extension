@@ -145,7 +145,9 @@ function mainwp_example_extension_activate()
     update_option('mainwp_example_extension_activated', 'yes');
 }
 
-
+/*
+* Activator Class is used for extension activation and deactivation
+*/
 
 class MainWPExampleExtensionActivator
 {
