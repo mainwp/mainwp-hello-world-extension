@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: MainWP Hello World! Extension
-Plugin URI: http://extensions.mainwp.com
+Plugin URI: https://mainwp.com
 Description: MainWP Hello World! Extension is a MainWP example extension
 Version: 1.0
 Author: MainWP
-Author URI: http://mainwp.com
+Author URI: https://mainwp.com
 Icon URI: 
 */
 class MainWPExampleExtension
