@@ -246,4 +246,5 @@ class MainWPExampleExtensionActivator
     }
 }
 
+global $MainWPExampleExtensionActivator;
 $mainWPExampleExtensionActivator = new MainWPExampleExtensionActivator();
