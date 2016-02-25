@@ -218,9 +218,7 @@ class MainWPExampleExtensionActivator
         // The 'mainwp-extension-enabled-check' hook. If the plugin is not enabled this will return false, 
         // if the plugin is enabled, an array will be returned containing a key. 
         // This key is used for some data requests to our main
-        $this->childEnabled = apply_filters('mainwp-extension-enabled-check', __FILE__);
-        
-        if (!$this->childEnabled) return;
+        $this->childEnabled = apply_filters('mainwp-extension-enabled-check', __FILE__);       
 
         $this->childKey = $this->childEnabled['key'];
 
