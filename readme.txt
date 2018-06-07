@@ -7,7 +7,7 @@ Filter "mainwp-getsites": Fetch child-sites data.
 * Call function on child-plugin
 Filter "mainwp_fetchurlauthed": call function get_all_posts on child-plugin
 
-Others callable functions on child-plugin:
+Other available functions on child-plugin:
     $callableFunctions = array(
         'stats' => 'getSiteStats',
         'upgrade' => 'upgradeWP',
