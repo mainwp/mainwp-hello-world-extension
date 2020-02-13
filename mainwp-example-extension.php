@@ -12,21 +12,28 @@ class MainWPExampleExtension
 {
   
     public function __construct()
-    {
-        add_action('init', array(&$this, 'init'));
-        add_action('admin_init', array(&$this, 'admin_init'));
-    }
-	
-    public function init()
-    {
+	{		
+		add_filter('mainwp-getsubpages-sites', array(&$this, 'managesites_subpage' ), 10, 1 );
+	}
 
-    }
+	function managesites_subpage( $subPage ) {		
+
+		$subPage[] = array(
+			'title'                 => 'Example Extension',
+			'slug'                     => 'ExampleExtension',
+			'sitetab'             => true,
+			'menu_hidden'     => true,
+			'callback'             => array( 'MainWPExampleExtension', 'renderPage' ),
+		);
+
+		return $subPage;
+	}
 
     /*
     * Create your extension page
     */
 
-    public function renderPage() {
+    public static function renderPage() {
         global $mainWPExampleExtensionActivator;
 
         // Fetch all child-sites 
@@ -126,24 +133,9 @@ class MainWPExampleExtension
                 </div>
             </div>
         <?php
-    }
-    
-    public function admin_init()
-    {
-       
-    }
+    }    
 }
 
-/*
-* The register_activation_hook function registers a plugin function to be run when the plugin is activated.
-*/
-
-register_activation_hook(__FILE__, 'mainwp_example_extension_activate');
-
-function mainwp_example_extension_activate()
-{   
-    update_option('mainwp_example_extension_activated', 'yes');
-}
 
 /*
 * Activator Class is used for extension activation and deactivation
@@ -155,6 +147,8 @@ class MainWPExampleExtensionActivator
     protected $childEnabled = false;
     protected $childKey = false;
     protected $childFile;
+	protected $plugin_handle = 'mainwp-example-extension';
+	
 
     public function __construct()
     {
@@ -173,23 +167,13 @@ class MainWPExampleExtensionActivator
             //Because sometimes our main plugin is activated after the extension plugin is activated we also have a second step, 
             //listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation. 
             add_action('mainwp-activated', array(&$this, 'activate_this_plugin'));
-        }
-        add_action('admin_init', array(&$this, 'admin_init'));
+        }        
         add_action('admin_notices', array(&$this, 'mainwp_error_notice'));
     }
 
-    function admin_init() {
-        if (get_option('mainwp_example_extension_activated') == 'yes')
-        {
-            delete_option('mainwp_example_extension_activated');
-            wp_redirect(admin_url('admin.php?page=Extensions'));
-            return;
-        }        
-    }
-    
     function get_this_extension($pArray)
     {
-        $pArray[] = array('plugin' => __FILE__,  'api' => 'mainwp-example-extension', 'mainwp' => false, 'callback' => array(&$this, 'settings'));
+        $pArray[] = array('plugin' => __FILE__,  'api' => $this->plugin_handle, 'mainwp' => false, 'callback' => array(&$this, 'settings'));
         return $pArray;
     }
 
@@ -221,6 +205,8 @@ class MainWPExampleExtensionActivator
         $this->childEnabled = apply_filters('mainwp-extension-enabled-check', __FILE__);       
 
         $this->childKey = $this->childEnabled['key'];
+		
+		new MainWPExampleExtension();
 
     }
 
