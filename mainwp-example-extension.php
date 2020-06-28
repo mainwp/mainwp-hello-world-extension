@@ -31,17 +31,19 @@ class MainWPExampleExtension
 	}
 
     /**
-     * @param $subPage
-     * @return mixed
+     * Add extension subpage.
+     *
+     * @param array $subPage Subpages array.
+     * @return array $subPages Subpages array with this extension added to it.
      */
     function managesites_subpage( $subPage ) {
 
 		$subPage[] = array(
-			'title'                 => 'Example Extension',
-			'slug'                     => 'ExampleExtension',
-			'sitetab'             => true,
-			'menu_hidden'     => true,
-			'callback'             => array( 'MainWPExampleExtension', 'renderPage' ),
+			'title'       => 'Example Extension',
+			'slug'        => 'ExampleExtension',
+			'sitetab'     => true,
+			'menu_hidden' => true,
+			'callback'    => array( 'MainWPExampleExtension', 'renderPage' ),
 		);
 
 		return $subPage;
@@ -204,7 +206,7 @@ class MainWPExampleExtensionActivator
     }
 
     /**
-     * @param $pArray
+     * @param array $pArray This extensions info array.
      * @return array $pArray This extensions info array.
      */
     function get_this_extension($pArray)
