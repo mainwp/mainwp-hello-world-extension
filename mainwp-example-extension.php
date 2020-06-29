@@ -206,6 +206,8 @@ class MainWPExampleExtensionActivator
     }
 
     /**
+     * Get this extension array.
+     *
      * @param array $pArray This extensions info array.
      * @return array $pArray This extensions info array.
      */
