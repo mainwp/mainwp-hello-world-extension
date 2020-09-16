@@ -1,45 +1,64 @@
 <?php
-/*
-Plugin Name: MainWP Hello World! Extension
-Plugin URI: https://mainwp.com
-Description: MainWP Hello World! Extension is a MainWP example extension
-Version: 1.0
-Author: MainWP
-Author URI: https://mainwp.com
-Icon URI: 
-*/
+/**
+ * MainWP Example Extension
+ * 
+ * MainWP Hello World! Extension is an example extension. 
+ *  This extension provides two examples for calling MainWP Actions and Hooks. 
+ *  Purpose of this extension is to give you a start point in developing your 
+ *  first custom extension for the MainWP Plugin.
+ * 
+ * Plugin Name: MainWP Hello World! Extension
+ * Plugin URI: https://mainwp.com
+ * Description: MainWP Hello World! Extension is a MainWP example extension
+ * Version: 1.0
+ * Author: MainWP
+ * Author URI: https://mainwp.com
+ * Icon URI: 
+ */
+
+/**
+ * Class MainWPExampleExtension
+ */
 class MainWPExampleExtension
 {
-  
+
+    /**
+     * MainWPExampleExtension constructor.
+     */
     public function __construct()
 	{		
 		add_filter('mainwp-getsubpages-sites', array(&$this, 'managesites_subpage' ), 10, 1 );
 	}
 
-	function managesites_subpage( $subPage ) {		
+    /**
+     * Add extension subpage.
+     *
+     * @param array $subPage Subpages array.
+     * @return array $subPages Subpages array with this extension added to it.
+     */
+    function managesites_subpage( $subPage ) {
 
 		$subPage[] = array(
-			'title'                 => 'Example Extension',
-			'slug'                     => 'ExampleExtension',
-			'sitetab'             => true,
-			'menu_hidden'     => true,
-			'callback'             => array( 'MainWPExampleExtension', 'renderPage' ),
+			'title'       => 'Example Extension',
+			'slug'        => 'ExampleExtension',
+			'sitetab'     => true,
+			'menu_hidden' => true,
+			'callback'    => array( 'MainWPExampleExtension', 'renderPage' ),
 		);
 
 		return $subPage;
 	}
 
-    /*
-    * Create your extension page
-    */
-
+    /**
+     * Create your extension page.
+     */
     public static function renderPage() {
         global $mainWPExampleExtensionActivator;
 
-        // Fetch all child-sites 
+        // Fetch all child-sites.
         $websites = apply_filters('mainwp-getsites', $mainWPExampleExtensionActivator->getChildFile(), $mainWPExampleExtensionActivator->getChildKey(), null);              
         
-        // Location to open on child site
+        // Location to open on child site.
         $location = "admin.php?page=mainwp_child_tab";                 
         
         if (is_array($websites)) {
@@ -55,7 +74,7 @@ class MainWPExampleExtension
                 <div class="inside">
                     <em><?php _e('List all child sites and link to open the child site'); ?></em>
                     <?php
-                    //Display number of your child sites
+                    //Display number of your child sites.
                     ?>
                     <p><?php echo __('Number of Child Sites: ') . count($websites); ?></p>
                     <div id="mainwp_example_links">
@@ -94,13 +113,13 @@ class MainWPExampleExtension
                                 echo "<p><strong>ERROR</strong>: ". __('Child Site Not Found') ."</p>";
                             } else {
 
-                                // Example to call function get_all_posts on child-plugin to get posts on child site
+                                // Example to call function get_all_posts on child-plugin to get posts on child site.
                                 $post_data = array(               
                                     'status' => 'publish',
                                     'maxRecords' => 10
                                 );
 
-                                // hook to call the function get_all_posts
+                                // hook to call the function get_all_posts.
                                 $information = apply_filters('mainwp_fetchurlauthed', $mainWPExampleExtensionActivator->getChildFile(), $mainWPExampleExtensionActivator->getChildKey(), $websiteId, 'get_all_posts', $post_data);			                            
                                 
                                 if (is_array($information)) {
@@ -136,26 +155,39 @@ class MainWPExampleExtension
     }    
 }
 
-
-/*
-* Activator Class is used for extension activation and deactivation
-*/
-
+/**
+ * Class MainWPExampleExtensionActivator
+ *
+ * Activator Class is used for extension activation and deactivation.
+ */
 class MainWPExampleExtensionActivator
 {
+    /** @var bool Whether or not MainWP Dashboard is activated or not. Default: FALSE. */
     protected $mainwpMainActivated = false;
-    protected $childEnabled = false;
-    protected $childKey = false;
-    protected $childFile;
-	protected $plugin_handle = 'mainwp-example-extension';
-	
 
+    /** @var bool Whether or not MainWP Child is Activated. Default: FALSE. */
+    protected $childEnabled = false;
+
+    /** @var bool Whether or not there is a Child Key. Default: FASLE. */
+    protected $childKey = false;
+
+    /** @var string Child File. */
+    protected $childFile;
+
+    /** @var string Plugin Slug. */
+    protected $plugin_handle = 'mainwp-example-extension';
+
+    /**
+     * MainWPExampleExtensionActivator constructor.
+     *
+     * @uses MainWPExampleExtension::activate_this_plugin()
+     */
     public function __construct()
     {
         $this->childFile = __FILE__;
         add_filter('mainwp-getextensions', array(&$this, 'get_this_extension'));
         
-        // This filter will return true if the main plugin is activated
+        // This filter will return true if the main plugin is activated.
         $this->mainwpMainActivated = apply_filters('mainwp-activated-check', false);
 
         if ($this->mainwpMainActivated !== false)
@@ -164,23 +196,38 @@ class MainWPExampleExtensionActivator
         }
         else
         {
-            //Because sometimes our main plugin is activated after the extension plugin is activated we also have a second step, 
-            //listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation. 
+            /**
+             * Because sometimes our main plugin is activated after the extension plugin is activated we also have a second step,
+             *  listening to the 'mainwp-activated' action. This action is triggered by MainWP after installation.
+             */
             add_action('mainwp-activated', array(&$this, 'activate_this_plugin'));
         }        
         add_action('admin_notices', array(&$this, 'mainwp_error_notice'));
     }
 
+    /**
+     * Get this extension array.
+     *
+     * @param array $pArray This extensions info array.
+     * @return array $pArray This extensions info array.
+     */
     function get_this_extension($pArray)
     {
         $pArray[] = array('plugin' => __FILE__,  'api' => $this->plugin_handle, 'mainwp' => false, 'callback' => array(&$this, 'settings'));
         return $pArray;
     }
 
+    /**
+     * Render extension settings Page.
+     *
+     * @uses MainWPExampleExtension::renderPage()
+     */
     function settings()
     {
-        //The "mainwp-pageheader-extensions" action is used to render the tabs on the Extensions screen. 
-        //It's used together with mainwp-pagefooter-extensions and mainwp-getextensions
+        /**
+         * The "mainwp-pageheader-extensions" action is used to render the tabs on the Extensions screen.
+         *  It's used together with mainwp-pagefooter-extensions and mainwp-getextensions
+         */
         do_action('mainwp-pageheader-extensions', __FILE__);
         if ($this->childEnabled)
         {
@@ -192,16 +239,29 @@ class MainWPExampleExtensionActivator
         }
         do_action('mainwp-pagefooter-extensions', __FILE__);
     }
-    
-    //The function "activate_this_plugin" is called when the main is initialized. 
+
+    /**
+     * Activate this plugin
+     *
+     * This function is called when MainWP Dashboard is initialized.
+     *
+     * @uses MainWPExampleExtension()
+     */
     function activate_this_plugin()
     {
-        //Checking if the MainWP plugin is enabled. This filter will return true if the main plugin is activated.
+        /**
+         * The 'mainwp-activated-check' hook checks if the MainWP Dashboard plugin is enabled.
+         *  This filter will return true if the main plugin is activated.
+         */
         $this->mainwpMainActivated = apply_filters('mainwp-activated-check', $this->mainwpMainActivated);
-        
-        // The 'mainwp-extension-enabled-check' hook. If the plugin is not enabled this will return false, 
-        // if the plugin is enabled, an array will be returned containing a key. 
-        // This key is used for some data requests to our main
+
+        /**
+         * The 'mainwp-extension-enabled-check' hook.
+         *
+         * If the plugin is not enabled this will return false,
+         *  if the plugin is enabled, an array will be returned containing a key.
+         *  This key is used for some data requests from MainWP Dashboard.
+         */
         $this->childEnabled = apply_filters('mainwp-extension-enabled-check', __FILE__);       
 
         $this->childKey = $this->childEnabled['key'];
@@ -210,6 +270,11 @@ class MainWPExampleExtensionActivator
 
     }
 
+    /**
+     * Display MainWP error notices
+     *
+     * This method handles displaying the MainWP error notices.
+     */
     function mainwp_error_notice()
     {
         global $current_screen;
@@ -219,16 +284,27 @@ class MainWPExampleExtensionActivator
         }
     }
 
+    /**
+     * Get Child Site key.
+     *
+     * @return bool TRUE|FALSE.
+     */
     public function getChildKey()
     {
         return $this->childKey;
     }
 
+    /**
+     * Get Child file.
+     *
+     * @return string Child File.
+     */
     public function getChildFile()
     {
         return $this->childFile;
     }
 }
 
+/** @global object $mainWPExampleExtensionActivator Instance of class object. */
 global $mainWPExampleExtensionActivator;
 $mainWPExampleExtensionActivator = new MainWPExampleExtensionActivator();
