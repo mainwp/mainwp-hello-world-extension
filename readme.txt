@@ -1,7 +1,7 @@
 === Example Extension ===
 
 * Fetch data from mainwp 
-Filter "mainwp-getsites": Fetch child-sites data. 
+Filter "mainwp_getsites": Fetch child-sites data. 
    
 
 * Call function on child-plugin
